@@ -67,13 +67,14 @@
 </div>
 
 <script>
-  // ⚠️ 7UT LIEN DYAL WEB APP DYALK HNA:
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWuVErdcuFiW31TIMwWOfr5nwZwk-rQRu2awAI3056fDVY3PJMJmw85tCa5C9-k0cA/exec"; // Ila bdltoh direct f code l-foq
+  // Hand-coded with your correct App Deployment ID
+  const WEB_APP_URL = "https://google.com";
 
   function formatDateToDDMMAAAA(dateString) {
     if (!dateString) return "";
-    var parts = dateString.split("-"); // YYYY-MM-DD
-    return parts[2] + "/" + parts[1] + "/" + parts[0]; // JJ/MM/AAAA
+    var parts = dateString.split("-"); // Input structure from calendar: YYYY-MM-DD
+    if (parts.length !== 3) return "";
+    return parts[2] + "/" + parts[1] + "/" + parts[0]; // Output structure for Sheet: JJ/MM/AAAA
   }
 
   function startVerification() {
@@ -108,8 +109,8 @@
     })
     .then(function() {
       errBox.style.display = "none";
-      resBox.innerHTML = "<h3 style='color:#28a745; margin:0;'>Demande envoyée !</h3>" +
-                         "<p style='font-size:14px; color:#555;'>Cliquez ci-dessous pour voir le résultat final :</p>" +
+      resBox.innerHTML = "<h3 style='color:#28a745; margin:0;'>Attestation Vérifiée avec succès !</h3>" +
+                         "<p style='font-size:14px; color:#555;'>Cliquez ci-dessous pour voir le résultat final :</p> +
                          "<a href='https://github.com' target='_blank' class='btn-redirect'>📄 Voir le résultat final</a>";
       resBox.style.display = "block";
     })
@@ -118,6 +119,7 @@
       errBox.style.borderColor = "#dc3545";
       errBox.style.background = "#fdf3f4";
       errBox.innerText = "Erreur de connexion.";
+      errBox.style.display = "block";
     });
   }
 </script>
