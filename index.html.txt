@@ -68,12 +68,12 @@
 
 <script>
   // ⚠️ 7UT LIEN DYAL WEB APP DYALK HNA:
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWuVErdcuFiW31TIMwWOfr5nwZwk-rQRu2awAI3056fDVY3PJMJmw85tCa5C9-k0cA/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWuVErdcuFiW31TIMwWOfr5nwZwk-rQRu2awAI3056fDVY3PJMJmw85tCa5C9-k0cA/exec"; // Ila bdltoh direct f code l-foq
 
   function formatDateToDDMMAAAA(dateString) {
     if (!dateString) return "";
-    var parts = dateString.split("-");
-    return parts[2] + "/" + parts[1] + "/" + parts[0];
+    var parts = dateString.split("-"); // YYYY-MM-DD
+    return parts[2] + "/" + parts[1] + "/" + parts[0]; // JJ/MM/AAAA
   }
 
   function startVerification() {
@@ -100,15 +100,13 @@
     errBox.innerText = "Vérification en cours...";
     errBox.style.display = "block";
     
-    // T-sifto l-data direct l l-Google Script b fetch
     fetch(WEB_APP_URL, {
       method: "POST",
-      mode: "no-cors", // Bach may-bloquich l-browser
+      mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ numAttestation: num, dateSession: date, captchaInput: captcha })
     })
     .then(function() {
-      // Hit khdamna b no-cors, ghadich nqdro nqraw response direct, walakin nfeardo success
       errBox.style.display = "none";
       resBox.innerHTML = "<h3 style='color:#28a745; margin:0;'>Demande envoyée !</h3>" +
                          "<p style='font-size:14px; color:#555;'>Cliquez ci-dessous pour voir le résultat final :</p>" +
