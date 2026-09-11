@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérification de l'attestation</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .card { max-width: 500px; width: 100%; background: white; border: 1px solid #e1e4e8; border-radius: 4px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .title-banner { font-size: 15px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; font-weight: 500; }
+    .form-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .form-group label { font-weight: bold; color: #222; font-size: 14px; width: 45%; text-align: left; }
+    .form-group input { width: 50%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; box-sizing: border-box; font-family: inherit; }
+    
+    .info-box { background-color: #e6f0fa; border-radius: 4px; padding: 15px; margin: 20px 0; border-left: 4px solid #0056b3; text-align: left; }
+    .info-box h4 { margin: 0 0 10px 0; color: #004085; font-size: 15px; display: flex; align-items: center; }
+    .info-box p { margin: 0; font-size: 13.5px; color: #333; line-height: 1.5; }
+    .info-box ul { margin: 10px 0 0 0; padding-left: 20px; font-size: 13.5px; color: #0056b3; }
+    
+    .captcha-container { text-align: left; margin-top: 20px; }
+    .captcha-img { background: linear-gradient(45deg, #e2e2e2, #f5f5f5); border: 1px solid #ccc; padding: 10px; font-size: 24px; font-family: 'Georgia', serif; font-style: italic; letter-spacing: 4px; color: #555; text-align: center; font-weight: bold; margin-bottom: 10px; border-radius: 4px; text-shadow: 1px 1px 2px #fff; }
+    .captcha-label { font-weight: bold; font-size: 13px; color: #222; margin-bottom: 8px; display: block; }
+    .captcha-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 15px; }
+    
+    .btn-search { width: 100%; background-color: #3170af; color: white; border: none; padding: 12px; font-size: 15px; font-weight: 500; border-radius: 4px; cursor: pointer; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .btn-search:hover { background-color: #26598c; }
+    
+    .results-box { margin-top: 20px; border: 1px solid #28a745; padding: 15px; background: #f4fbf6; border-radius: 4px; display: none; text-align: center; }
+    .btn-redirect { display: inline-block; width: 100%; padding: 12px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; box-sizing: border-box; font-size: 16px; }
+    .btn-redirect:hover { background-color: #218838; }
+    .error-box { margin-top: 20px; border: 1px solid #dc3545; padding: 15px; background: #fdf3f4; color: #dc3545; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="title-banner">Renseignez les informations présentes sur l'attestation</div>
+  
+  <div class="form-group">
+    <label>Numéro d'attestation</label>
+    <input type="text" id="numAttestation">
+  </div>
+  
+  <div class="form-group">
+    <label>Date de la session</label>
+    <input type="date" id="dateSession" lang="fr-FR">
+  </div>
+  
+  <div class="info-box">
+    <h4>🛈 Où trouver le numéro d'attestation et la date de session ?</h4>
+    <p>Attention, pour le numéro d'attestation, vous ne devez saisir que la partie qui se trouve après le dernier tiret ("-").</p>
+    <ul>
+      <li>Cliquez ici pour voir où se trouve le numéro d'attestation et la date de session sur l'attestation dématérialisée</li>
+    </ul>
+  </div>
+  
+  <div class="captcha-container">
+    <div class="captcha-img">Sept + Quatre</div>
+    <span class="captcha-label">Saisissez la somme des deux nombres en chiffres</span>
+    <input type="text" id="captchaInput" class="captcha-input" placeholder="Somme en chiffres">
+  </div>
+  
+  <button class="btn-search" onclick="startVerification()">🔍 Rechercher l'attestation</button>
+
+  <div id="resultsContainer" class="results-box"></div>
+  <div id="errorContainer" class="error-box"></div>
+</div>
+
+<script>
+  // ⚠️ 7UT LIEN DYAL WEB APP DYALK HNA:
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzWuVErdcuFiW31TIMwWOfr5nwZwk-rQRu2awAI3056fDVY3PJMJmw85tCa5C9-k0cA/exec";
+
+  function formatDateToDDMMAAAA(dateString) {
+    if (!dateString) return "";
+    var parts = dateString.split("-");
+    return parts[2] + "/" + parts[1] + "/" + parts[0];
+  }
+
+  function startVerification() {
+    var num = document.getElementById('numAttestation').value;
+    var rawDate = document.getElementById('dateSession').value;
+    var captcha = document.getElementById('captchaInput').value;
+    
+    var errBox = document.getElementById('errorContainer');
+    var resBox = document.getElementById('resultsContainer');
+    
+    errBox.style.display = "none";
+    resBox.style.display = "none";
+    
+    if(!num || !rawDate || !captcha) {
+      alert("Veuillez remplir tous les champs !");
+      return;
+    }
+
+    var date = formatDateToDDMMAAAA(rawDate);
+    
+    errBox.style.color = "#3170af";
+    errBox.style.borderColor = "#3170af";
+    errBox.style.background = "#e6f0fa";
+    errBox.innerText = "Vérification en cours...";
+    errBox.style.display = "block";
+    
+    // T-sifto l-data direct l l-Google Script b fetch
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      mode: "no-cors", // Bach may-bloquich l-browser
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ numAttestation: num, dateSession: date, captchaInput: captcha })
+    })
+    .then(function() {
+      // Hit khdamna b no-cors, ghadich nqdro nqraw response direct, walakin nfeardo success
+      errBox.style.display = "none";
+      resBox.innerHTML = "<h3 style='color:#28a745; margin:0;'>Demande envoyée !</h3>" +
+                         "<p style='font-size:14px; color:#555;'>Cliquez ci-dessous pour voir le résultat final :</p>" +
+                         "<a href='https://github.com' target='_blank' class='btn-redirect'>📄 Voir le résultat final</a>";
+      resBox.style.display = "block";
+    })
+    .catch(function(e) {
+      errBox.style.color = "#dc3545";
+      errBox.style.borderColor = "#dc3545";
+      errBox.style.background = "#fdf3f4";
+      errBox.innerText = "Erreur de connexion.";
+    });
+  }
+</script>
+
+</body>
+</html>
